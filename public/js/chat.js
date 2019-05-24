@@ -22,19 +22,21 @@ const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true
 });
 
-socket.on("message", ({ text: message, createdAt }) => {
+socket.on("message", ({ text: message, createdAt, username }) => {
   const html = Mustache.render(messageTemplates, {
     message,
-    createdAt: moment(createdAt).format("h:mm a")
+    createdAt: moment(createdAt).format("h:mm a"),
+    username
   });
 
   $messagesDiv.insertAdjacentHTML("beforeend", html);
 });
 
-socket.on("locationMessage", (url, createdAt) => {
+socket.on("locationMessage", ({ url, createdAt, username }) => {
   const html = Mustache.render(locationTemplates, {
     url,
-    createdAt: moment(createdAt).format("h:mm a")
+    createdAt: moment(createdAt).format("h:mm a"),
+    username
   });
 
   $messagesDiv.insertAdjacentHTML("beforeend", html);

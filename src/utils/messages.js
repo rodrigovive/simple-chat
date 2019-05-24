@@ -1,11 +1,15 @@
-const generateMessage = text => ({
+const generateMessage = ({ text, username }) => ({
   text,
-  createdAt: new Date().getTime()
+  createdAt: new Date().getTime(),
+  username
 });
 
-const generateLocationMessage = geolocation => ({
-  url: `https://google.com/maps?q=${geolocation.latitude},${geolocation.longitude}`,
-  createdAt: new Date().getTime()
+const generateLocationMessage = ({ geolocation, username }) => ({
+  url: `https://google.com/maps?q=${geolocation.latitude},${
+    geolocation.longitude
+  }`,
+  createdAt: new Date().getTime(),
+  username
 });
 
 module.exports = {

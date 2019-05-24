@@ -29,13 +29,19 @@ io.on("connection", socket => {
     if (filter.isProfane(message)) {
       return callback("Not allow for bad words");
     }
+    const { room, username } = getUser(socket.id);
 
-    io.emit("message", generateMessage(message));
+    io.to(room).emit("message", generateMessage({ text: message, username }));
     callback("message received");
   });
 
   socket.on("sendLocation", (geolocation, callback) => {
-    io.emit("locationMessage", generateLocationMessage(geolocation));
+    const { room, username } = getUser(socket.id);
+
+    io.to(room).emit(
+      "locationMessage",
+      generateLocationMessage({ geolocation, username })
+    );
     callback();
   });
 
@@ -49,11 +55,17 @@ io.on("connection", socket => {
     if (error) {
       return callback(error);
     }
-    socket.join(user.room);
-    socket.emit("message", generateMessage("Welcome!"));
+    socket.join(room);
+    socket.emit(
+      "message",
+      generateMessage({ text: "Welcome!", username: "Admin" })
+    );
     socket.broadcast
       .to(room)
-      .emit("message", generateMessage(`${user.username} has joined!`));
+      .emit(
+        "message",
+        generateMessage({ text: `${username} has joined!`, username: "Admin" })
+      );
 
     callback();
   });
@@ -64,11 +76,12 @@ io.on("connection", socket => {
     if (user) {
       io.to(user.room).emit(
         "message",
-        generateMessage(`${user.username} has left!`)
+        generateMessage({
+          text: `${user.username} has left!`,
+          username: "Admin"
+        })
       );
     }
-
-    io.emit("message", generateMessage("A user has left!"));
   });
 
   //   socket.on("increment", () => {
