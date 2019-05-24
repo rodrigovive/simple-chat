@@ -32,7 +32,7 @@ io.on("connection", socket => {
     const { room, username } = getUser(socket.id);
 
     io.to(room).emit("message", generateMessage({ text: message, username }));
-    callback("message received");
+    callback();
   });
 
   socket.on("sendLocation", (geolocation, callback) => {
@@ -67,20 +67,23 @@ io.on("connection", socket => {
         generateMessage({ text: `${username} has joined!`, username: "Admin" })
       );
 
+    io.to(room).emit("roomData", { room, users: getUsersInRoom(room) });
     callback();
   });
 
   socket.on("disconnect", () => {
-    const user = removeUser(socket.io);
+    const user = removeUser(socket.id);
 
     if (user) {
-      io.to(user.room).emit(
+      const { room, username } = user;
+      io.to(room).emit(
         "message",
         generateMessage({
-          text: `${user.username} has left!`,
+          text: `${username} has left!`,
           username: "Admin"
         })
       );
+      io.to(room).emit("roomData", { room, users: getUsersInRoom(room) });
     }
   });
 

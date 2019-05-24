@@ -9,7 +9,7 @@ const $messageFormInput = $messageForm.querySelector("input");
 const $messageFormButton = $messageForm.querySelector("button");
 const $sendLocationButton = document.querySelector("#send-location");
 const $messagesDiv = document.querySelector("#messages");
-
+const $sidebarDiv = document.querySelector("#sidebar");
 // Templates
 
 const messageTemplates = document.querySelector("#message-template").innerHTML;
@@ -17,10 +17,24 @@ const messageTemplates = document.querySelector("#message-template").innerHTML;
 const locationTemplates = document.querySelector("#location-template")
   .innerHTML;
 
+const sidebarTemplate = document.querySelector("#sidebar-template").innerHTML;
 // Options
 const { username, room } = Qs.parse(location.search, {
   ignoreQueryPrefix: true
 });
+
+const autoscroll = () => {
+  const $newMessage = $messagesDiv.lastElementChild;
+  const newMessageStyles = getComputedStyle($newMessage);
+  const newMessageMargin = parseInt(newMessageStyles.marginBottom);
+  const newMessageHeight = $newMessage.offsetHeight + newMessageMargin;
+  const visibleHeight = $messagesDiv.offsetHeight;
+  const containerHeight = $messagesDiv.scrollHeight;
+  const scrollOffset = $messagesDiv.scrollTop + visibleHeight;
+  if (containerHeight - newMessageHeight <= scrollOffset) {
+    $messagesDiv.scrollTop = $messagesDiv.scrollHeight;
+  }
+};
 
 socket.on("message", ({ text: message, createdAt, username }) => {
   const html = Mustache.render(messageTemplates, {
@@ -30,6 +44,15 @@ socket.on("message", ({ text: message, createdAt, username }) => {
   });
 
   $messagesDiv.insertAdjacentHTML("beforeend", html);
+  autoscroll();
+});
+
+socket.on("roomData", ({ room, users }) => {
+  const html = Mustache.render(sidebarTemplate, {
+    room,
+    users
+  });
+  $sidebarDiv.innerHTML = html;
 });
 
 socket.on("locationMessage", ({ url, createdAt, username }) => {
@@ -40,6 +63,7 @@ socket.on("locationMessage", ({ url, createdAt, username }) => {
   });
 
   $messagesDiv.insertAdjacentHTML("beforeend", html);
+  autoscroll();
 });
 
 $messageForm.addEventListener("submit", e => {
@@ -57,7 +81,6 @@ $messageForm.addEventListener("submit", e => {
       if (error) {
         return console.log(error);
       }
-      console.log("Message delivered");
     });
   }
 });

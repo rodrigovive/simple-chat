@@ -32,23 +32,23 @@ const addUser = ({ id, username, room }) => {
   };
 };
 
-addUser({
-  id: 33,
-  username: "test 1",
-  room: "xd"
-});
+// addUser({
+//   id: 33,
+//   username: "test 1",
+//   room: "xd"
+// });
 
-addUser({
-  id: 43,
-  username: "test 2",
-  room: "xd"
-});
+// addUser({
+//   id: 43,
+//   username: "test 2",
+//   room: "xd"
+// });
 
-addUser({
-  id: 53,
-  username: "test 3",
-  room: "xd2"
-});
+// addUser({
+//   id: 53,
+//   username: "test 3",
+//   room: "xd2"
+// });
 
 const removeUser = id => {
   const index = users.findIndex(user => user.id === id);
@@ -57,6 +57,9 @@ const removeUser = id => {
     return users.splice(index, 1)[0];
   }
 };
+
+// const userRemoved = removeUser(33);
+// console.log("Rmove ", userRemoved);
 
 const getUser = id => users.find(user => user.id === id);
 
